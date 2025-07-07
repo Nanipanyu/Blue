@@ -1,0 +1,191 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
+// tells Prisma to generate TypeScript client code for interacting with your DB.
+generator client {  
+  provider = "prisma-client-js"
+}
+
+//connects Prisma to your PostgreSQL database using the .env variable DATABASE_URL.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// @relation directive tells Prisma:
+// “This field is part of a relationship (foreign key) between two models.”
+
+model User {
+  id        String   @id @default(uuid())  // @id marks a field as the primary key for the table.
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  region    String
+  avatar    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ownedTeams    Team[]        @relation("TeamOwner")
+  teamMembers   TeamMember[]
+  sentChallenges Challenge[]  @relation("ChallengeFrom")
+  receivedNotifications Notification[]
+  reportedMatches Match[]    @relation("MatchReporter")
+
+  @@map("users")
+}
+
+model Team {
+  id           String   @id @default(uuid())
+  name         String
+  sport        String
+  region       String
+  description  String?
+  maxPlayers   Int      @default(11)
+  contactEmail String
+  contactPhone String
+  avatar       String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Stats
+  wins         Int @default(0)
+  losses       Int @default(0)
+  draws        Int @default(0)
+  rating       Int @default(1500)
+  matchesPlayed Int @default(0)
+
+  // Relations
+  owner        User         @relation("TeamOwner", fields: [ownerId], references: [id])
+  ownerId      String
+  members      TeamMember[]
+  sentChallenges     Challenge[] @relation("ChallengeFromTeam")
+  receivedChallenges Challenge[] @relation("ChallengeToTeam")
+  homeMatches  Match[]      @relation("HomeTeam")
+  awayMatches  Match[]      @relation("AwayTeam")
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id       String @id @default(uuid())
+  joinedAt DateTime @default(now())
+  role     String @default("member") // member, captain, vice-captain
+
+  // Relations
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  team     Team   @relation(fields: [teamId], references: [id])
+  teamId   String
+
+  @@unique([userId, teamId])
+  @@map("team_members")
+}
+
+model Challenge {
+  id           String      @id @default(uuid())
+  sport        String
+  proposedDate DateTime
+  proposedTime String
+  venue        String?
+  message      String?
+  status       ChallengeStatus @default(PENDING)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  fromUser     User        @relation("ChallengeFrom", fields: [fromUserId], references: [id])
+  fromUserId   String
+  fromTeam     Team        @relation("ChallengeFromTeam", fields: [fromTeamId], references: [id])
+  fromTeamId   String
+  toTeam       Team        @relation("ChallengeToTeam", fields: [toTeamId], references: [id])
+  toTeamId     String
+  match        Match?
+
+  @@map("challenges")
+}
+
+model Match {
+  id        String      @id @default(uuid())
+  sport     String
+  matchDate DateTime
+  venue     String?
+  status    MatchStatus @default(SCHEDULED)
+  result    MatchResult?
+  notes     String?
+  
+  // Scores
+  homeScore Int?
+  awayScore Int?
+  winnerId  String?
+  
+  // Rating changes
+  homeRatingChange Int?
+  awayRatingChange Int?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  challenge    Challenge @relation(fields: [challengeId], references: [id])
+  challengeId  String    @unique
+  homeTeam     Team      @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  homeTeamId   String
+  awayTeam     Team      @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  awayTeamId   String
+  reportedBy   User      @relation("MatchReporter", fields: [reportedById], references: [id])
+  reportedById String
+
+  @@map("matches")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  data      Json?            // Additional data for the notification
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user      User             @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@map("notifications")
+}
+
+enum ChallengeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchResult {
+  WIN
+  LOSS
+  DRAW
+}
+
+enum NotificationType {
+  CHALLENGE_RECEIVED
+  CHALLENGE_ACCEPTED
+  CHALLENGE_DECLINED
+  MATCH_SCHEDULED
+  MATCH_COMPLETED
+  TEAM_INVITATION
+  RATING_UPDATE
+}
