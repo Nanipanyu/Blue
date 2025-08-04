@@ -28,12 +28,61 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Profile Information
+  bio                String?
+  dateOfBirth        DateTime?
+  gender             String?
+  city               String?
+  country            String?
+  
+  // Contact & Social
+  emailVisibility    VisibilityType @default(PRIVATE)
+  instagramUrl       String?
+  twitterUrl         String?
+  facebookUrl        String?
+  linkedinUrl        String?
+  
+  // Sports Preferences
+  favoriteSports     String[] // Array of sports
+  preferredPositions String[] // Array of positions
+  skillLevel         SkillLevel?
+  
+  // Personal Stats
+  totalMatches       Int @default(0)
+  totalWins          Int @default(0)
+  totalGoals         Int @default(0)
+  totalAssists       Int @default(0)
+  
+  // Availability
+  weeklyAvailability Json? // Store as JSON: {"monday": ["09:00-12:00"], "tuesday": [], ...}
+  willingToJoinTeams Boolean @default(true)
+  
+  // Media
+  photoGallery       String[] // Array of photo URLs
+  highlightVideos    String[] // Array of video URLs
+  
+  // Settings
+  profileVisibility  VisibilityType @default(PUBLIC)
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  
+  // Additional Features
+  qrCode             String? // Generated QR code for profile sharing
+  favoriteTeams      String[] // Array of favorite team names
+  favoritePlayers    String[] // Array of favorite player names
+  isVerified         Boolean @default(false)
+  
+  // Profile completion
+  profileCompleted   Boolean @default(false)
+
   // Relations
   ownedTeams    Team[]        @relation("TeamOwner")
   teamMembers   TeamMember[]
   sentChallenges Challenge[]  @relation("ChallengeFrom")
   receivedNotifications Notification[]
   reportedMatches Match[]    @relation("MatchReporter")
+  achievements  Achievement[]
+  trophies      Trophy[]
 
   @@map("users")
 }
@@ -112,7 +161,7 @@ model Challenge {
 model Match {
   id        String      @id @default(uuid())
   sport     String
-  matchDate DateTime
+  matchDate DateTime?   // Made optional to handle existing data
   venue     String?
   status    MatchStatus @default(SCHEDULED)
   result    MatchResult?
@@ -137,8 +186,8 @@ model Match {
   homeTeamId   String
   awayTeam     Team      @relation("AwayTeam", fields: [awayTeamId], references: [id])
   awayTeamId   String
-  reportedBy   User      @relation("MatchReporter", fields: [reportedById], references: [id])
-  reportedById String
+  reportedBy   User?     @relation("MatchReporter", fields: [reportedById], references: [id])
+  reportedById String?   // Made optional to handle existing data
 
   @@map("matches")
 }
@@ -157,6 +206,36 @@ model Notification {
   userId    String
 
   @@map("notifications")
+}
+
+model Achievement {
+  id          String          @id @default(cuid())
+  type        AchievementType
+  title       String
+  description String
+  icon        String?
+  dateEarned  DateTime
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime        @default(now())
+
+  @@map("achievements")
+}
+
+model Trophy {
+  id          String     @id @default(cuid())
+  type        TrophyType
+  title       String
+  description String
+  icon        String?
+  dateEarned  DateTime
+  event       String?    // Tournament/competition name
+  position    String?    // 1st, 2nd, 3rd place etc.
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+
+  @@map("trophies")
 }
 
 enum ChallengeStatus {
@@ -188,4 +267,36 @@ enum NotificationType {
   MATCH_COMPLETED
   TEAM_INVITATION
   RATING_UPDATE
+}
+
+enum VisibilityType {
+  PUBLIC
+  PRIVATE
+  FRIENDS_ONLY
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  PROFESSIONAL
+}
+
+enum AchievementType {
+  MVP
+  TOP_SCORER
+  BEST_DEFENSE
+  TEAM_PLAYER
+  CAPTAIN
+  TOURNAMENT_WINNER
+  STREAK_WINNER
+  COMEBACK_KING
+}
+
+enum TrophyType {
+  GOLD
+  SILVER
+  BRONZE
+  PARTICIPATION
+  SPECIAL
 }

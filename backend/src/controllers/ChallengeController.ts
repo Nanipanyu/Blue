@@ -314,7 +314,7 @@ export class ChallengeController {
             homeTeamId: challenge.toTeamId,
             awayTeamId: challenge.fromTeamId,
             sport: challenge.sport,
-            date: challenge.proposedDate,
+            matchDate: challenge.proposedDate,
             venue: challenge.venue
           }
         });

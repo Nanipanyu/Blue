@@ -438,7 +438,7 @@ export class TeamController {
             select: { id: true, name: true }
           }
         },
-        orderBy: { date: 'desc' },
+        orderBy: { createdAt: 'desc' },
         take: 10
       });
 

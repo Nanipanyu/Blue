@@ -33,11 +33,11 @@ export default function Home() {
             and climb the regional rankings. Build your team, challenge others, and become legends in your community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/create-team" className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors">
-              Create Your Team
+            <Link href="/login" className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition-colors">
+              Get Started - Login
             </Link>
-            <Link href="/explore" className="border-2 border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition-colors">
-              Explore Teams
+            <Link href="/signup" className="border-2 border-indigo-600 text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition-colors">
+              Join Now - Sign Up
             </Link>
           </div>
         </div>
@@ -111,8 +111,8 @@ export default function Home() {
           <p className="text-xl text-indigo-100 mb-8">
             Join thousands of teams already competing in their communities.
           </p>
-          <Link href="/create-team" className="bg-white text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors">
-            Get Started Today
+          <Link href="/signup" className="bg-white text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-colors">
+            Join TeamUp Today
           </Link>
         </div>
       </div>

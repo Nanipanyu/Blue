@@ -58,4 +58,5 @@ router.put('/profile', [
     .withMessage('Please provide a valid phone number')
 ], AuthController.updateProfile);
 
+
 export default router;

@@ -93,16 +93,12 @@ export const SPORTS = [
 ] as const;
 
 export const REGIONS = [
-  'North District',
-  'South District',
-  'East District',
-  'West District',
-  'Central District',
-  'Downtown',
-  'Suburbs',
-  'University Area',
-  'Industrial Zone',
-  'Coastal Area'
+  'North America',
+  'South America',
+  'Europe',
+  'Asia',
+  'Africa',
+  'Oceania'
 ] as const;
 
 export type Sport = typeof SPORTS[number];

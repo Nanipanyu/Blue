@@ -95,7 +95,7 @@ export class MatchController {
             homeScore,
             awayScore,
             sport: challenge.sport,
-            date: new Date(matchDate),
+            matchDate: new Date(matchDate),
             venue,
             status: 'COMPLETED'
           },

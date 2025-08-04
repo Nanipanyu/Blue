@@ -13,6 +13,7 @@ import teamRoutes from './routes/teams';
 import challengeRoutes from './routes/challenges';
 import matchRoutes from './routes/matches';
 import notificationRoutes from './routes/notifications';
+import profileRoutes from './routes/profile';
 
 // Load environment variables
 dotenv.config();
@@ -27,7 +28,11 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://localhost:3001', // Add support for port 3001
+    'http://localhost:3000'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -67,6 +72,7 @@ app.use('/api/teams', teamRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
