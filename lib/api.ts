@@ -10,7 +10,6 @@ import {
   UpdateSportsPreferencesRequest,
   UpdatePrivacySettingsRequest,
   UpdateAvailabilityRequest,
-  UpdateMediaRequest,
   AddAchievementRequest,
   AddTrophyRequest,
   Team,
@@ -26,6 +25,10 @@ import {
   NotificationFilters,
   Achievement,
   Trophy,
+  Post,
+  CreatePostRequest,
+  PostComment,
+  PostLikeResponse,
 } from './types';
 
 // Purpose of This Code
@@ -55,10 +58,19 @@ class ApiClient {
   //this is a custom helper method to handle API requests by wrapping fetch(), Automatically adds headers and token, Handles error messages,Makes all API calls consistent and reusable
   private async request<T>(endpoint: string,options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;  // Construct the full URL for the API endpoint
-    const headers: Record<string, string> = {   // Set default headers for the request
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string>),
-    };
+    
+    // Set default headers for the request, but handle FormData differently
+    const headers: Record<string, string> = {};
+    
+    // Only set Content-Type for non-FormData requests
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    // Add any additional headers
+    if (options.headers) {
+      Object.assign(headers, options.headers);
+    }
 
     if (this.token) {
       headers['Authorization'] = `Bearer ${this.token}`;
@@ -320,13 +332,6 @@ class ApiClient {
     });
   }
 
-  async updateMedia(data: UpdateMediaRequest): Promise<ApiResponse<User>> {
-    return this.request<ApiResponse<User>>('/profile/media', {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  }
-
   async updatePrivacySettings(data: UpdatePrivacySettingsRequest): Promise<ApiResponse<User>> {
     return this.request<ApiResponse<User>>('/profile/privacy-settings', {
       method: 'PUT',
@@ -351,6 +356,88 @@ class ApiClient {
     return this.request<ApiResponse<Trophy>>('/profile/trophies', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  // Upload methods
+  async uploadPhotos(formData: FormData): Promise<ApiResponse<{ uploadedUrls: string[]; totalPhotos: number }>> {
+    return this.request<ApiResponse<{ uploadedUrls: string[]; totalPhotos: number }>>('/uploads/photos', {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header for FormData - browser will set it automatically
+      headers: {}
+    });
+  }
+
+  async uploadVideos(formData: FormData): Promise<ApiResponse<{ uploadedUrls: string[]; totalVideos: number }>> {
+    return this.request<ApiResponse<{ uploadedUrls: string[]; totalVideos: number }>>('/uploads/videos', {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header for FormData - browser will set it automatically
+      headers: {}
+    });
+  }
+
+  async removePhoto(photoUrl: string): Promise<ApiResponse<{ remainingPhotos: number }>> {
+    return this.request<ApiResponse<{ remainingPhotos: number }>>('/uploads/photos', {
+      method: 'DELETE',
+      body: JSON.stringify({ photoUrl }),
+    });
+  }
+
+  async removeVideo(videoUrl: string): Promise<ApiResponse<{ remainingVideos: number }>> {
+    return this.request<ApiResponse<{ remainingVideos: number }>>('/uploads/videos', {
+      method: 'DELETE',
+      body: JSON.stringify({ videoUrl }),
+    });
+  }
+
+  // Post-related methods
+  async getUserPosts(userId: string, type?: 'PHOTO' | 'VIDEO' | 'TEXT'): Promise<ApiResponse<Post[]>> {
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    
+    return this.request<ApiResponse<Post[]>>(`/posts/user/${userId}${queryString}`);
+  }
+
+  async getUserPhotos(userId: string): Promise<ApiResponse<Post[]>> {
+    return this.getUserPosts(userId, 'PHOTO');
+  }
+
+  async getUserVideos(userId: string): Promise<ApiResponse<Post[]>> {
+    return this.getUserPosts(userId, 'VIDEO');
+  }
+
+  async createPost(data: CreatePostRequest): Promise<ApiResponse<Post>> {
+    return this.request<ApiResponse<Post>>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async togglePostLike(postId: string): Promise<ApiResponse<PostLikeResponse>> {
+    return this.request<ApiResponse<PostLikeResponse>>(`/posts/${postId}/like`, {
+      method: 'POST',
+    });
+  }
+
+  async addPostComment(postId: string, content: string): Promise<ApiResponse<PostComment>> {
+    return this.request<ApiResponse<PostComment>>(`/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async deletePostComment(commentId: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<ApiResponse<{ message: string }>>(`/posts/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async deletePost(postId: string): Promise<ApiResponse<{ message: string }>> {
+    return this.request<ApiResponse<{ message: string }>>(`/posts/${postId}`, {
+      method: 'DELETE',
     });
   }
 }

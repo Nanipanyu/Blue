@@ -35,8 +35,6 @@ export interface ProfileData {
   totalAssists?: number;
   weeklyAvailability?: Record<string, string[]>;
   willingToJoinTeams?: boolean;
-  photoGallery?: string[];
-  highlightVideos?: string[];
   profileVisibility?: 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY';
   emailNotifications?: boolean;
   pushNotifications?: boolean;
@@ -193,23 +191,6 @@ export const useUpdateAvailability = () => {
 };
 
 // Update media
-export const useUpdateMedia = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: {
-      photoGallery?: string[];
-      highlightVideos?: string[];
-    }) => {
-      const response = await apiClient.updateMedia(data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-    },
-  });
-};
-
 // Update privacy settings
 export const useUpdatePrivacySettings = () => {
   const queryClient = useQueryClient();
@@ -281,6 +262,74 @@ export const useAddTrophy = () => {
       position?: string;
     }) => {
       const response = await apiClient.addTrophy(data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+};
+
+// Upload photos
+export const useUploadPhotos = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (files: FileList) => {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('photos', file);
+      });
+      const response = await apiClient.uploadPhotos(formData);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+};
+
+// Upload videos
+export const useUploadVideos = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (files: FileList) => {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('videos', file);
+      });
+      const response = await apiClient.uploadVideos(formData);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+};
+
+// Remove photo
+export const useRemovePhoto = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (photoUrl: string) => {
+      const response = await apiClient.removePhoto(photoUrl);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+  });
+};
+
+// Remove video
+export const useRemoveVideo = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (videoUrl: string) => {
+      const response = await apiClient.removeVideo(videoUrl);
       return response.data;
     },
     onSuccess: () => {

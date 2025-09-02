@@ -60,10 +60,6 @@ export interface User {
   weeklyAvailability?: Record<string, string[]>; // {monday: ["09:00-12:00"], tuesday: [], ...}
   willingToJoinTeams?: boolean;
   
-  // Media
-  photoGallery?: string[];
-  highlightVideos?: string[];
-  
   // Settings
   profileVisibility?: 'PUBLIC' | 'PRIVATE' | 'FRIENDS_ONLY';
   emailNotifications?: boolean;
@@ -136,12 +132,6 @@ export interface UpdateAvailabilityRequest {
   weeklyAvailability?: Record<string, string[]>;
   willingToJoinTeams?: boolean;
 }
-
-export interface UpdateMediaRequest {
-  photoGallery?: string[];
-  highlightVideos?: string[];
-}
-
 export interface AddAchievementRequest {
   type: string;
   title: string;
@@ -349,4 +339,63 @@ export interface Trophy {
   position?: string;
   userId: string;
   createdAt: string;
+}
+
+// Post Types
+export interface Post {
+  id: string;
+  type: 'PHOTO' | 'VIDEO' | 'TEXT';
+  mediaUrl?: string;
+  content?: string;
+  caption?: string;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  likes: PostLike[];
+  comments: PostComment[];
+  _count: {
+    likes: number;
+    comments: number;
+  };
+}
+
+export interface PostLike {
+  id: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface PostComment {
+  id: string;
+  content: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+}
+
+export interface CreatePostRequest {
+  mediaUrl: string;
+  type: 'PHOTO' | 'VIDEO';
+  caption?: string;
+}
+
+export interface PostLikeResponse {
+  liked: boolean;
+  likeCount: number;
 }

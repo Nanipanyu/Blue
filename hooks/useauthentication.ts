@@ -8,6 +8,7 @@ class AuthState {
   private static instance: AuthState;
   private user: User | null = null;
   private isLoading: boolean = true;
+  private initialized: boolean = false;
   private listeners: Set<() => void> = new Set();
 
   static getInstance() {
@@ -19,6 +20,11 @@ class AuthState {
 
   // Initialize authentication state
   async initialize() {
+    // Prevent multiple initialization calls
+    if (this.initialized) {
+      return;
+    }
+
     this.isLoading = true;
     this.notifyListeners();
 
@@ -31,7 +37,23 @@ class AuthState {
           // Set token first so API calls can be made
           apiClient.setToken(token);
           
-          // Verify token with server by trying to get current user profile
+          // Parse stored user data
+          const parsedUserData = JSON.parse(userData);
+          
+          // Only verify token with server if we don't have user data or token seems old
+          // This prevents unnecessary API calls on every page load
+          if (parsedUserData && parsedUserData.id) {
+            // Use stored user data and mark as authenticated
+            this.user = parsedUserData;
+            this.isLoading = false;
+            this.initialized = true;
+            this.notifyListeners();
+            
+            console.log('🔑 Authentication initialized from localStorage');
+            return;
+          }
+          
+          // Only if we have token but no valid user data, verify with server
           const response = await apiClient.getProfile();
           
           if (response.success && response.data) {
@@ -60,6 +82,7 @@ class AuthState {
     }
 
     this.isLoading = false;
+    this.initialized = true;
     this.notifyListeners();
   }
 
@@ -76,6 +99,7 @@ class AuthState {
   setUser(user: User | null) {
     this.user = user;
     this.isLoading = false; // Ensure loading is stopped when user is set
+    this.initialized = true; // Mark as initialized when user is set
     
     // Update localStorage
     if (typeof window !== 'undefined') {
@@ -84,6 +108,8 @@ class AuthState {
       } else {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        // Reset initialization state on logout
+        this.initialized = false;
       }
     }
     

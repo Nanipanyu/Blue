@@ -67,7 +67,7 @@ export class AuthController {
       const token = jwt.sign(
         tokenPayload,
         process.env.JWT_SECRET!,
-        { expiresIn: '7d' }
+        { expiresIn: '24h' }
       );
 
       res.status(201).json({
@@ -152,7 +152,7 @@ export class AuthController {
       const token = jwt.sign(
         tokenPayload,
         process.env.JWT_SECRET!,
-        { expiresIn: '7d' }
+        { expiresIn: '24h' }
       );
 
       // Remove password from response

@@ -9,6 +9,7 @@ import { useAuthentication } from '../../hooks/useauthentication';
 import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { Team } from '../../lib/types';
+import AppNavbar from '../../components/AppNavbar';
 
 // Type for selected team with user team info
 interface SelectedTeamWithUserTeam extends Team {
@@ -146,8 +147,6 @@ export default function ExploreTeams() {
         message: challengeForm.message.trim() || `Challenge from ${selectedTeam.userTeam.name}!`
       };
 
-      console.log('Sending challenge data:', challengeData); // Debug log
-
       await createChallengeMutation.mutateAsync(challengeData);
       
       // Success feedback with details
@@ -172,26 +171,8 @@ export default function ExploreTeams() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-indigo-600">TeamUp</Link>
-            <nav className="flex items-center space-x-4">
-              <Link href="/create-team" className="text-gray-700 hover:text-indigo-600">Create Team</Link>
-              <Link href="/dashboard" className="text-gray-700 hover:text-indigo-600">Dashboard</Link>
-              <div className="flex items-center space-x-4 ml-6 pl-6 border-l border-gray-200">
-                <Link 
-                  href="/logout" 
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
-                >
-                  Logout
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </header>
+  {/* Header */}
+  <AppNavbar />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -8,6 +8,7 @@ import { useRecentMatches } from '../../hooks/useMatches';
 import { useAuthentication } from '../../hooks/useauthentication';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { CreateTeamRequest, Team } from '../../lib/types';
+import AppNavbar from '../../components/AppNavbar';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -119,28 +120,7 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold text-indigo-600">TeamUp</Link>
-            <nav className="flex items-center space-x-4">
-              <Link href="/create-team" className="text-gray-700 hover:text-indigo-600">Create Team</Link>
-              <Link href="/explore" className="text-gray-700 hover:text-indigo-600">Explore Teams</Link>
-              <Link href="/profile" className="text-gray-700 hover:text-indigo-600">Profile</Link>
-              <div className="flex items-center space-x-4 ml-6 pl-6 border-l border-gray-200">
-                <span className="text-sm text-gray-600">Welcome back!</span>
-                <Link 
-                  href="/logout" 
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
-                >
-                  Logout
-                </Link>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </header>
+  <AppNavbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>

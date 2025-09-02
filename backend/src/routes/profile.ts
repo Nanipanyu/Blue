@@ -17,7 +17,6 @@ router.get('/:userId', ProfileController.getPublicProfile);
 router.put('/social-links', authenticate, ProfileController.updateSocialLinks);
 router.put('/sports-preferences', authenticate, ProfileController.updateSportsPreferences);
 router.put('/availability', authenticate, ProfileController.updateAvailability);
-router.put('/media', authenticate, ProfileController.updateMedia);
 router.put('/privacy-settings', authenticate, ProfileController.updatePrivacySettings);
 router.post('/generate-qr', authenticate, ProfileController.generateQRCode);
 router.post('/achievements', authenticate, ProfileController.addAchievement);

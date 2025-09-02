@@ -48,8 +48,6 @@ export class ProfileController {
           totalAssists: true,
           weeklyAvailability: true,
           willingToJoinTeams: true,
-          photoGallery: true,
-          highlightVideos: true,
           profileVisibility: true,
           emailNotifications: true,
           pushNotifications: true,
@@ -92,7 +90,16 @@ export class ProfileController {
       const {
         name,
         phone,
-        avatar
+        avatar,
+        bio,
+        city,
+        country,
+        gender,
+        dateOfBirth,
+        instagramUrl,
+        twitterUrl,
+        facebookUrl,
+        linkedinUrl
       } = req.body;
 
       const updatedUser = await prisma.user.update({
@@ -101,6 +108,15 @@ export class ProfileController {
           name,
           phone,
           avatar,
+          bio,
+          city,
+          country,
+          gender,
+          dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+          instagramUrl,
+          twitterUrl,
+          facebookUrl,
+          linkedinUrl,
           updatedAt: new Date()
         },
         select: {
@@ -108,6 +124,15 @@ export class ProfileController {
           name: true,
           phone: true,
           avatar: true,
+          bio: true,
+          city: true,
+          country: true,
+          gender: true,
+          dateOfBirth: true,
+          instagramUrl: true,
+          twitterUrl: true,
+          facebookUrl: true,
+          linkedinUrl: true,
           updatedAt: true
         }
       });
@@ -251,37 +276,6 @@ export class ProfileController {
       res.json({ user: updatedUser });
     } catch (error) {
       console.error('Update availability error:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  }
-
-  // Media Management
-  static async updateMedia(req: AuthRequest, res: Response) {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-
-      const { photoGallery, highlightVideos } = req.body;
-
-      const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          photoGallery: photoGallery || [],
-          highlightVideos: highlightVideos || [],
-          updatedAt: new Date()
-        },
-        select: {
-          id: true,
-          photoGallery: true,
-          highlightVideos: true,
-        }
-      });
-
-      res.json({ user: updatedUser });
-    } catch (error) {
-      console.error('Update media error:', error);
       res.status(500).json({ message: 'Server error' });
     }
   }

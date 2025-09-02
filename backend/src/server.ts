@@ -14,6 +14,8 @@ import challengeRoutes from './routes/challenges';
 import matchRoutes from './routes/matches';
 import notificationRoutes from './routes/notifications';
 import profileRoutes from './routes/profile';
+import uploadRoutes from './routes/uploads';
+import postRoutes from './routes/posts';
 
 // Load environment variables
 dotenv.config();
@@ -52,7 +54,8 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
-// Body parsing middleware
+// Body parsing middleware (but skip for upload routes)
+app.use('/api/uploads', uploadRoutes); // Move uploads BEFORE body parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -73,6 +76,8 @@ app.use('/api/challenges', challengeRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/profile', profileRoutes);
+// Note: uploads route is mounted above before body parsers
+app.use('/api/posts', postRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

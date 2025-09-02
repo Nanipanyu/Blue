@@ -7,6 +7,7 @@ import { useCreateTeam } from '../../hooks/useTeams';
 import { useAuthentication } from '../../hooks/useauthentication';
 import { CreateTeamRequest } from '../../lib/types';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import AppNavbar from '../../components/AppNavbar';
 
 const sports = [
   'Football', 'Basketball', 'Cricket', 'Volleyball', 
@@ -109,26 +110,8 @@ export default function CreateTeam() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <Link href="/" className="text-2xl font-bold text-indigo-600">TeamUp</Link>
-              <nav className="flex items-center space-x-4">
-                <Link href="/explore" className="text-gray-700 hover:text-indigo-600">Explore Teams</Link>
-                <Link href="/dashboard" className="text-gray-700 hover:text-indigo-600">Dashboard</Link>
-                <div className="flex items-center space-x-4 ml-6 pl-6 border-l border-gray-200">
-                  <Link 
-                    href="/logout" 
-                    className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
-                  >
-                    Logout
-                  </Link>
-                </div>
-              </nav>
-            </div>
-        </div>
-      </header>
+  {/* Header */}
+  <AppNavbar />
 
       {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

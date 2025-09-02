@@ -57,10 +57,6 @@ model User {
   weeklyAvailability Json? // Store as JSON: {"monday": ["09:00-12:00"], "tuesday": [], ...}
   willingToJoinTeams Boolean @default(true)
   
-  // Media
-  photoGallery       String[] // Array of photo URLs
-  highlightVideos    String[] // Array of video URLs
-  
   // Settings
   profileVisibility  VisibilityType @default(PUBLIC)
   emailNotifications Boolean @default(true)
@@ -83,6 +79,9 @@ model User {
   reportedMatches Match[]    @relation("MatchReporter")
   achievements  Achievement[]
   trophies      Trophy[]
+  posts         Post[]
+  postLikes     PostLike[]
+  postComments  PostComment[]
 
   @@map("users")
 }
@@ -236,6 +235,61 @@ model Trophy {
   createdAt   DateTime   @default(now())
 
   @@map("trophies")
+}
+
+model Post {
+  id        String      @id @default(cuid())
+  type      PostType    // PHOTO, VIDEO, TEXT
+  mediaUrl  String?     // URL for photos/videos (nullable for text posts)
+  content   String?     // Text content for text posts
+  caption   String?     // Caption for all post types
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  likes    PostLike[]
+  comments PostComment[]
+
+  @@map("posts")
+}
+
+model PostLike {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id      String @id @default(cuid())
+  content String
+  userId  String
+  postId  String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("post_comments")
+}
+
+enum PostType {
+  PHOTO
+  VIDEO
+  TEXT
 }
 
 enum ChallengeStatus {
